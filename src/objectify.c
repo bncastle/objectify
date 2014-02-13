@@ -86,10 +86,10 @@ int main(int argc, char **argv)
 
 	if(argc < 3)
 	{
-		printf("\n== Objectify Copyright 2014 Pixelbyte Studios ==\n");
-		printf("Usage: %s <input file> <output name>\n", argv[0]);
-		printf("Purpose: Produces a COFF file you can link to.\n");
-		printf("================================================");
+		fprintf(stdout, "\n== Objectify (Copyright 2014 Pixelbyte Studios) ==\n");
+		fprintf(stdout, "Usage: objectify.exe <input file> <output name>\n");
+		fprintf(stdout, "Purpose: Produces a COFF file that can be linked to.\n");
+		fprintf(stdout, "================================================\n");
 
 		return EXIT_SUCCESS;
 	}
@@ -104,7 +104,7 @@ int main(int argc, char **argv)
 
 	if(fin == NULL)
 	{
-		printf("Error: %s does not exist!\n", fname);
+		fprintf(stderr, "Error: %s does not exist!\n", fname);
 		return EXIT_FAILURE;
 	}
 
