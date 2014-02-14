@@ -2,10 +2,10 @@ Objectify: A COFF generator
 ========
 
 Objectify is like objcopy for Linux but with less options.
-It converts any input file into the [Microsoft Common Object File Format (COFF)](http://msdn.microsoft.com/en-us/windows/hardware/gg463119.aspx) This is useful for linking data files to your C executables. I've found it particularly useful for embedding compiled lua scripts.
+It converts any input file into the [Microsoft Common Object File Format (COFF)](http://msdn.microsoft.com/en-us/windows/hardware/gg463119.aspx) for linking data files into C executables. 
 
 ###Building
-To build Objectify, you will need:
+Requirements:
 
 1. A version of Microsoft Visual Studio or MinGW. 
 2. [Lake.exe](https://github.com/bncastle/Lake.exe) or Steve Donovan's original [Lake](https://github.com/stevedonovan/Lake) plus an installation of Lua.
