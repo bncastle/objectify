@@ -26,16 +26,14 @@ To start making COFFs, put the exe in your path somewhere and type:
 	objectify <infile.ext> <output file>
 Where <infile.ext> is the file you want to convert and <output file> is the name you want for the generated COFF file.
 
-Once the COFF file is created, you will have access to 3 symbols:
+Once the COFF file is created, you will have access to 2 symbols:
 
 	_binary_<infile_ext>_start
-	_binary_<infile_ext>_end
 	_binary_<infile_ext>_size
 
 To access them from your C file, declare them as externals and link in the COFF file. For example if you converted a file called **test.luc**, you could add the following declarations to your C file:
 
 	extern char binary_test_luc_start;
-	extern char binary_test_luc_end;
 	extern char binary_test_luc_size;
 
 One important thing to note is that these symbols aren't really variables. Instead, their address is their value. They can be declared as whatever makes sense in the code. For example, to get the binary blob size just do the following:

@@ -5,14 +5,12 @@
 // Objectify, a tiny COFF file generator (like objcopy for Linux, but not as full-featured)
 // This converts any file to a COFF format so you can link it to a binary file and use it from your c code
 //
-// Once the COFF file is created, you will have access to 3 symbols:
+// Once the COFF file is created, you will have access to 2 symbols:
 // _binary_<inputfilename_ext>_start
-// _binary_<inputfilename_ext>_end
 // _binary_<inputfilename_ext>_size
 //
 // To access them from your C file, simply declare them. Ex:
 // extern char binary_test_luc_start[];
-// extern char binary_test_luc_end[];
 // extern char binary_test_luc_size[];
 //
 // After you get them in, you can cast them to whatever type you want.
@@ -80,9 +78,9 @@ int main(int argc, char **argv)
 	FILE *fin, *fout;
 	char *fname;
 	char *outname;
-	char symbols[3][80];
-	int symbol_val[3] = {0, 0, 0};
-	int symbol_sec[3] = {1, 1, 0xFFFF};
+	char symbols[2][80];
+	int symbol_val[2] = {0, 0};
+	int symbol_sec[2] = {1, 0xFFFF};
 
 	if(argc < 3)
 	{
@@ -114,10 +112,6 @@ int main(int argc, char **argv)
 	fclose(fin);
 	///////////////////////////////////////////////////
 
-	//Go ahead and set these up now
-	symbol_val[1] = obj_size;
-	symbol_val[2] = obj_size;
-
 	//Create our COFF header
 	//Any settings not set are either supposed to be 0 or will be set later
 	COFFHeader coff_header;
@@ -127,7 +121,7 @@ int main(int argc, char **argv)
 	//Symbol table location = coff header size + all section headers + section header data size
 	//note: for now i only have 1 section so my calcs are a bit simpler
 	coff_header.symbol_table_pointer = COFF_HEADER_SIZE + SECTION_HEADER_SIZE + obj_size;
-	coff_header.num_symbols = 3;                  // hardcoded to 3
+	coff_header.num_symbols = 2;                  // hardcoded to 2
 	coff_header.characteristics = 0x105;          // 32-bit machine, line #s stripped, relocs stripped
 
 	//Setup our one and only section
@@ -161,20 +155,23 @@ int main(int argc, char **argv)
 	strcat(symbols[0], fname);
 	strcat(symbols[0], "_start");
 
+	// strcpy(symbols[1], SYMBOL_PREFIX);
+	// strcat(symbols[1], fname);
+	// strcat(symbols[1], "_end");
+	//symbol_val[1] = obj_size;
+
 	strcpy(symbols[1], SYMBOL_PREFIX);
 	strcat(symbols[1], fname);
-	strcat(symbols[1], "_end");
+	strcat(symbols[1], "_size");
+	symbol_val[1] = obj_size;
 
-	strcpy(symbols[2], SYMBOL_PREFIX);
-	strcat(symbols[2], fname);
-	strcat(symbols[2], "_size");
 
 	//We'll keep track of the offset into the COFF string table as we'll need it
 	//Start it at 4 since it includes the 4 bytes for the string table length
 	offset = 4;
 	//we need the size of all strings combined (include the 4 byte offset location)
 	string_table_size = 4;
-	for(i = 0; i < 3; i++)
+	for(i = 0; i < 2; i++)
 	{
 		string_table_size += strlen(symbols[i]) + 1;
 
