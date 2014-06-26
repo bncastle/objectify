@@ -191,9 +191,9 @@ int main(int argc, char **argv)
 
 		fwrite(&symbol_val[i], sizeof(int), 1, fout);  //Symbol value
 		write_short(fout, symbol_sec[i]); 
-		write_short(fout, 0); //Type
-		fputc(2, fout); //Storage class (2 for us)
-		fputc(0, fout); //#of aux symbols (0 for us)
+		write_short(fout, 0); 	//Type
+		fputc(2, fout); 		//Storage class (2 for us)
+		fputc(0, fout); 		//#of aux symbols (0 for us)
 
 		offset += strlen(symbols[i]) + 1;  //Offset by the string size + 1
 	}
