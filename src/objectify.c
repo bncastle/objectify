@@ -231,7 +231,8 @@ int main(int argc, char **argv)
 	}
 	
 	//We skip the 1st character thus the [1]
-	printf("Use the following in your file:\n extern char %s; \n extern char %s;", &symbols[0][1], &symbols[1][1]);
+	printf("\nUse the following in your file:\n   extern char %s;\n   extern char %s;\n", &symbols[0][1], &symbols[1][1]);
+	printf("Access size in bytes of the blob:\n   int size = (int) &%s;", &symbols[1][1]);
 
 	fclose(fout);
 	return EXIT_SUCCESS;
