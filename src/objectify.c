@@ -6,18 +6,23 @@
 // This converts any file to a COFF format so you can link it to a binary file and use it from your c code
 //
 // Once the COFF file is created, you will have access to 2 symbols:
-// _binary_<inputfilename_ext>_start
-// _binary_<inputfilename_ext>_size
+// _binary_<outputname>_start
+// _binary_<outputname>_size
 //
 // To access them from your C file, simply declare them. Ex:
-// extern char binary_test_luc_start[];
-// extern char binary_test_luc_size[];
+// extern char binary_test_start;
+// extern char binary_test_size;
 //
 // After you get them in, you can cast them to whatever type you want.
 //
+//To get a char * pointer:
+// const char *data = &binary_test_start;
+// To get the size simply:
+// int size = (int) &binary_test_size;
+//
 //Author: Bryan Castleberry
-//Date: Feb 2014
-//Copyright 2014 Pixelbyte Studios LLC
+//Date: April 2016
+//Copyright 2016 Pixelbyte Studios LLC
 //
 
 #define SYMBOL_PREFIX	"_binary_"
@@ -71,6 +76,16 @@ void write_short(FILE *fw, ushort val)
 	fwrite(&val, sizeof(ushort), 1, fw);
 }
 
+//Grabs only the filename without the path
+//
+char * find_start_of_filename(const char *ch)
+{
+	char *p = (char *)ch + strlen(ch);
+	while(p > ch && *p != '\\') p--;
+	if(*p == '\\') p++;
+	return p;
+}
+
 int main(int argc, char **argv)
 {
 	int i, offset,string_table_size;
@@ -84,7 +99,7 @@ int main(int argc, char **argv)
 
 	if(argc < 3)
 	{
-		fprintf(stdout, "\n== Objectify (Copyright 2014 Pixelbyte Studios) ==\n");
+		fprintf(stdout, "\n== Objectify (Copyright 2016 Pixelbyte Studios) ==\n");
 		fprintf(stdout, "Usage: objectify.exe <input file> <output name>\n");
 		fprintf(stdout, "Purpose: Produces a COFF file that can be linked to.\n");
 		fprintf(stdout, "================================================\n");
@@ -94,6 +109,15 @@ int main(int argc, char **argv)
 
 	fname = argv[1];
 	outname = argv[2];
+	
+	char outNoext[256];
+	char *nameStart = find_start_of_filename(outname);
+	strcpy(outNoext, nameStart);
+	
+	printf("%s", outNoext);
+	//find any '.' and set it to NULL
+	char *pch = strchr(outNoext, '.');
+	if(pch != NULL) *pch = '\0';
 
 	memset(z, 0, 8);
 
@@ -144,24 +168,24 @@ int main(int argc, char **argv)
 
 	//Make the basename for our symbols
 	i = 0;
-	while(fname[i] != '\0') 
+	while(outNoext[i] != '\0') 
 	{
-		if(fname[i] == '.') fname[i] = '_';
+		if(outNoext[i] == '.') outNoext[i] = '_';
 		i++;
 	}
 
 	//Write the symbol tables for each of our 3 symbols
 	strcpy(symbols[0], SYMBOL_PREFIX);
-	strcat(symbols[0], fname);
+	strcat(symbols[0], outNoext);
 	strcat(symbols[0], "_start");
 
 	// strcpy(symbols[1], SYMBOL_PREFIX);
-	// strcat(symbols[1], fname);
+	// strcat(symbols[1], outNoext);
 	// strcat(symbols[1], "_end");
 	//symbol_val[1] = obj_size;
 
 	strcpy(symbols[1], SYMBOL_PREFIX);
-	strcat(symbols[1], fname);
+	strcat(symbols[1], outNoext);
 	strcat(symbols[1], "_size");
 	symbol_val[1] = obj_size;
 
@@ -205,6 +229,9 @@ int main(int argc, char **argv)
 		fwrite(symbols[i],1, strlen(symbols[i]), fout);
 		fputc(0, fout); //0 terminate the symbols
 	}
+	
+	//We skip the 1st character thus the [1]
+	printf("Use the following in your file:\n extern char %s; \n extern char %s;", &symbols[0][1], &symbols[1][1]);
 
 	fclose(fout);
 	return EXIT_SUCCESS;
